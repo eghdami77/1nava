@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>توابع صعودی و نزولی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1e3a5f;
+  --blue:#2563eb;
+  --orange:#f2731e;
+  --green:#16a34a;
+  --yellow:#eab308;
+  --ink:#1c1c1c;
+  --paper:#ffffff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{font-family:'Vazirmatn',Tahoma,sans-serif;color:var(--ink);min-height:100vh;overflow-x:hidden;position:relative;}
+
+.smoke-bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 30% 20%,#2b2b30,#111114 70%);}
+.smoke-blob{position:fixed;border-radius:50%;filter:blur(60px);opacity:.55;z-index:-1;mix-blend-mode:screen;pointer-events:none;}
+.b1{width:60vw;height:60vw;background:#3d3d46;top:-15vw;right:-15vw;animation:drift1 26s ease-in-out infinite;}
+.b2{width:70vw;height:70vw;background:#2a2f3a;bottom:-25vw;left:-20vw;animation:drift2 32s ease-in-out infinite;}
+.b3{width:45vw;height:45vw;background:#4a4a52;top:40%;left:35%;animation:drift3 22s ease-in-out infinite;}
+.b4{width:38vw;height:38vw;background:#333941;top:10%;left:10%;animation:drift1 30s ease-in-out infinite reverse;}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(6vw,4vw) scale(1.15);}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-5vw,-6vw) scale(1.1);}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(4vw,-5vw) scale(0.9);}}
+
+.app-header{position:sticky;top:0;z-index:20;padding:16px 14px 12px;text-align:center;
+  background:linear-gradient(180deg,rgba(15,15,18,.92),rgba(15,15,18,.72));backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(255,255,255,.08);}
+.app-header h1{margin:0;font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 0 18px rgba(120,140,255,.35);}
+.app-header .sub{margin-top:4px;font-size:.78rem;color:#b9bcc7;}
+
+.wrap{max-width:480px;margin:0 auto;padding:14px 12px 90px;}
+.card{background:var(--paper);border-radius:18px;padding:18px 16px 22px;box-shadow:0 18px 40px rgba(0,0,0,.45);min-height:60vh;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.hero-illustration{background:linear-gradient(180deg,#eaf0fb,#ffffff);border-radius:16px;padding:8px 6px 2px;
+  margin-bottom:14px;border:1px solid #e3e9f5;animation:heroFloat 4.5s ease-in-out infinite;}
+@keyframes heroFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+.intro{font-size:.92rem;line-height:2;color:#333;margin-bottom:16px;}
+.intro b{color:var(--navy);}
+.nav-grid{display:flex;flex-direction:column;gap:16px;}
+.nav-btn{display:flex;align-items:center;gap:10px;border:3px solid #000;border-radius:16px;padding:17px 16px;
+  font-family:inherit;font-size:1.03rem;font-weight:800;color:#fff;cursor:pointer;text-align:right;
+  box-shadow:0 6px 0 #000, 0 12px 22px rgba(0,0,0,.4);transition:transform .12s ease, box-shadow .12s ease;position:relative;}
+.nav-btn .ic{font-size:1.4rem;filter:drop-shadow(0 2px 1px rgba(0,0,0,.3));}
+.nav-btn:active{transform:translateY(6px);box-shadow:0 0 0 #000, 0 4px 10px rgba(0,0,0,.35);}
+.nav-btn.blue{background:linear-gradient(155deg,#4c86ff,#2563eb);}
+.nav-btn.orange{background:linear-gradient(155deg,#ff8a3d,#e2600c);}
+.nav-btn.green{background:linear-gradient(155deg,#22c55e,#158038);}
+.nav-btn.yellow{background:linear-gradient(155deg,#facc15,#ca8a04);color:#241d02;}
+
+.back-row{display:flex;justify-content:flex-start;margin-bottom:14px;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#1e3a5f);
+  color:#fff;font-family:inherit;font-weight:800;font-size:.95rem;border:2.5px solid #000;border-radius:30px;
+  padding:11px 20px 11px 16px;cursor:pointer;box-shadow:0 5px 0 #000, 0 9px 18px rgba(37,99,235,.45);
+  animation:glowPulse 1.8s ease-in-out infinite;}
+.back-btn .arrow{display:inline-block;animation:arrowNudge 1.2s ease-in-out infinite;}
+.back-btn:active{transform:translateY(5px);box-shadow:0 0 0 #000,0 3px 8px rgba(0,0,0,.3);}
+@keyframes glowPulse{0%,100%{box-shadow:0 5px 0 #000,0 9px 16px rgba(37,99,235,.4);}50%{box-shadow:0 5px 0 #000,0 9px 26px rgba(37,99,235,.75);}}
+@keyframes arrowNudge{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
+@keyframes bounceIn{0%{transform:translateY(-16px) scale(.9);opacity:0;}60%{transform:translateY(3px) scale(1.02);opacity:1;}100%{transform:translateY(0) scale(1);}}
+.back-btn.enter{animation:bounceIn .5s ease, glowPulse 1.8s ease-in-out infinite .5s;}
+
+.page-title{font-size:1.15rem;font-weight:800;margin:0 0 14px;padding-bottom:8px;border-bottom:3px solid var(--accent,#2563eb);color:var(--ink);}
+#page-concepts .page-title{--accent:var(--blue);}
+#page-examples .page-title{--accent:var(--orange);}
+#page-quiz .page-title{--accent:var(--green);}
+#page-results .page-title{--accent:var(--green);}
+#page-notes .page-title{--accent:var(--yellow);}
+
+.block{background:#f7f8fb;border:1px solid #e8eaf0;border-radius:14px;padding:14px;margin-bottom:14px;}
+.block h3{margin:0 0 8px;font-size:1rem;color:var(--navy);}
+.block p{margin:6px 0;font-size:.9rem;line-height:2.05;color:#2b2b2b;}
+.note-box{background:#fef9e7;border:1px solid #f3e2a0;border-right:5px solid var(--yellow);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:.87rem;line-height:1.95;}
+.note-box b{color:#8a6300;}
+.special-box{background:#eef4ff;border:2px dashed var(--navy);border-radius:12px;padding:13px 14px;margin:12px 0;font-size:.88rem;line-height:2;}
+.special-box .tag{display:inline-block;background:var(--navy);color:#fff;font-size:.72rem;font-weight:800;border-radius:6px;padding:2px 9px;margin-bottom:6px;}
+
+math{direction:ltr;unicode-bidi:isolate;}
+.math-line{direction:ltr;text-align:center;margin:9px 0;padding:10px 8px;background:#fff;border-radius:9px;border:1px solid #e3e6ec;font-size:1.05rem;}
+.math-line math{font-size:1.12em;}
+.inline-math{font-size:.95em;}
+
+.piecewise,.case-rows{display:flex;align-items:center;gap:8px;direction:ltr;justify-content:center;flex-wrap:wrap;
+  margin:10px 0;background:#fff;border:1px dashed #d7dbe4;border-radius:10px;padding:12px 10px;}
+.piecewise .brace{font-size:2.7em;font-weight:300;color:#333;line-height:.9;}
+.piecewise .rows,.case-rows .rows{display:flex;flex-direction:column;gap:8px;}
+.piecewise .row,.case-rows .row{display:flex;gap:16px;font-size:.95rem;align-items:center;}
+.piecewise .row .cond,.case-rows .row .cond{color:#555;}
+
+svg.diagram{width:100%;height:auto;display:block;background:#fff;border-radius:10px;}
+.svg-wrap{margin:10px 0;}
+.caption{font-size:.78rem;color:#666;text-align:center;margin-top:4px;}
+
+.reveal-btn{border:none;border-radius:10px;padding:9px 16px;font-family:inherit;font-weight:700;font-size:.85rem;
+  cursor:pointer;color:#fff;background:var(--btn-color,#f2731e);margin-top:6px;}
+.answer-box{display:none;margin-top:10px;background:#fff5ec;border:1px solid #f6cfa9;border-right:5px solid var(--orange);
+  border-radius:10px;padding:12px;font-size:.88rem;line-height:2;}
+.answer-box.show{display:block;animation:fadeIn .3s ease;}
+
+.dual-diagram{position:relative;width:100%;max-width:320px;margin:10px auto 2px;aspect-ratio:300/190;
+  background:#fff;border-radius:12px;border:1px solid #e8eaf0;overflow:hidden;}
+.diagram-bg{position:absolute;inset:0;width:100%;height:100%;}
+.guide-v,.guide-h,.shadow-dot,.pt-dot,.pt-lbl{position:absolute;transition:all .8s ease;}
+.guide-v{width:0;border-left:2px dashed;}
+.guide-h{height:0;border-top:2px dashed;}
+.shadow-dot{width:15px;height:15px;border-radius:50%;opacity:.28;transform:translate(-50%,-50%);filter:blur(1.5px);}
+.pt-dot{width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 0 5px rgba(0,0,0,.35);}
+.pt-lbl{font-size:10.5px;font-weight:800;}
+.pt-lbl-x{transform:translate(-50%,0);}
+.pt-lbl-y{transform:translate(-100%,-50%);}
+.diagram-caption{direction:ltr;text-align:center;font-size:1rem;margin:6px 0 4px;background:#f4f6fa;border-radius:8px;padding:9px;}
+.diagram-note{direction:rtl;text-align:center;font-size:.82rem;color:#8a6300;background:#fef9e7;border:1px solid #f3e2a0;border-radius:8px;padding:7px 10px;margin:0 0 14px;}
+
+.qcard{background:#f7f8fb;border:1px solid #e8eaf0;border-radius:14px;padding:14px;margin-bottom:14px;}
+.qcard .qtitle{font-weight:700;font-size:.92rem;margin-bottom:4px;color:var(--ink);line-height:1.9;}
+.opt{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #dfe3ea;border-radius:10px;
+  padding:10px 12px;margin-bottom:8px;font-size:.87rem;cursor:pointer;}
+.opt .inline-math{direction:ltr;}
+.opt.selected{border-color:var(--green);background:#eafaf0;}
+.opt input{accent-color:var(--green);width:16px;height:16px;}
+.submit-btn{width:100%;border:none;border-radius:12px;padding:14px;font-family:inherit;font-weight:800;font-size:1rem;
+  color:#fff;background:linear-gradient(135deg,#15803d,#16a34a);cursor:pointer;margin-top:6px;}
+.retry-btn{width:100%;border:none;border-radius:12px;padding:13px;font-family:inherit;font-weight:700;font-size:.92rem;
+  color:#fff;background:linear-gradient(135deg,#1e3a5f,#28527f);cursor:pointer;margin-top:10px;}
+
+.score-banner{text-align:center;border-radius:14px;padding:18px;margin-bottom:16px;color:#fff;background:linear-gradient(135deg,#15803d,#16a34a);}
+.score-banner .num{font-size:2.1rem;font-weight:800;}
+.score-banner.low{background:linear-gradient(135deg,#b91c1c,#dc2626);}
+.res-item{border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1.5px solid #e2e5eb;}
+.res-item.correct{border-color:#8fd6a8;background:#f2fbf5;}
+.res-item.wrong{border-color:#f3aba0;background:#fef4f2;}
+.res-tag{display:inline-block;font-size:.72rem;font-weight:800;border-radius:6px;padding:2px 8px;margin-bottom:6px;color:#fff;}
+.res-tag.ok{background:var(--green);}
+.res-tag.bad{background:#dc2626;}
+.res-item .your{font-size:.83rem;margin:4px 0;color:#444;}
+.res-item .your .inline-math{direction:ltr;}
+.res-item .sol{font-size:.85rem;line-height:2;margin-top:6px;color:#2b2b2b;}
+
+.ctrl-bar{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;gap:10px;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(0deg,rgba(10,10,12,.95),rgba(10,10,12,.7));backdrop-filter:blur(6px);
+  border-top:1px solid rgba(255,255,255,.08);}
+.ctrl-btn{flex:1;max-width:170px;display:flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:22px;padding:10px 8px;font-family:inherit;font-weight:700;font-size:.8rem;color:#fff;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);cursor:pointer;}
+.ctrl-btn:active{transform:scale(.96);}
+.ctrl-btn.music.playing{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+
+.designer{text-align:center;font-size:.75rem;color:#9aa0ad;padding:16px 0 8px;}
+
+.confetti{position:fixed;top:-20px;border-radius:2px;z-index:60;pointer-events:none;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(600deg);opacity:.3;}}
+
+@media (max-width:360px){
+  .app-header h1{font-size:1.15rem;}
+  .card{padding:14px 12px 18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="smoke-bg"></div>
+<div class="smoke-blob b1"></div>
+<div class="smoke-blob b2"></div>
+<div class="smoke-blob b3"></div>
+<div class="smoke-blob b4"></div>
+
+<header class="app-header">
+  <h1>توابع صعودی و نزولی</h1>
+  <div class="sub">ریاضی ۳ — پایهٔ دوازدهم تجربی</div>
+</header>
+
+<div class="wrap">
+  <div class="card">
+
+    <!-- ===================== HOME ===================== -->
+    <section class="page active" id="page-home">
+      <div class="hero-illustration">
+        <svg viewBox="0 0 320 150" width="100%" height="auto">
+          <path d="M10,45 C60,45 90,115 150,115 C200,115 230,30 310,30" fill="none" stroke="#1e3a5f" stroke-width="4.5" stroke-linecap="round"/>
+
+          <!-- نزولی arrow + label (above the descending slope, clear of the line) -->
+          <path d="M70,40 L70,68 M62,58 L70,70 L78,58" stroke="#dc2626" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="88" y="32" font-size="15" fill="#dc2626" font-weight="800">نزولی</text>
+
+          <!-- صعودی arrow + label (above the ascending slope, clear of the line) -->
+          <path d="M210,112 L210,74 M202,84 L210,71 L218,84" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="224" y="24" font-size="15" fill="#16a34a" font-weight="800">صعودی</text>
+
+          <ellipse cx="24" cy="136" rx="18" ry="7" fill="#cbd5e1" opacity=".45"/>
+          <ellipse cx="298" cy="136" rx="16" ry="7" fill="#cbd5e1" opacity=".4"/>
+        </svg>
+      </div>
+      <p class="intro">
+        در این آموزش با مفهوم <b>تابع صعودی</b>، <b>تابع نزولی</b>، <b>اکیدا صعودی</b> و <b>اکیدا نزولی</b> آشنا می‌شوید،
+        چند مثال حل‌شده می‌بینید و در پایان با یک آزمون کوتاه یادگیری خود را می‌سنجید. یکی از بخش‌ها را انتخاب کنید:
+      </p>
+      <div class="nav-grid">
+        <button class="nav-btn blue" onclick="goto('concepts')"><span class="ic">📘</span> تعریف‌ها و آموزش تصویری</button>
+        <button class="nav-btn orange" onclick="goto('examples')"><span class="ic">✏️</span> مثال‌های حل‌شده</button>
+        <button class="nav-btn green" onclick="openQuiz()"><span class="ic">📝</span> آزمون</button>
+        <button class="nav-btn yellow" onclick="goto('notes')"><span class="ic">💡</span> نکات کلیدی</button>
+      </div>
+    </section>
+
+    <!-- ===================== CONCEPTS (defs + visual lesson merged) ===================== -->
+    <section class="page" id="page-concepts">
+      <div class="back-row"><button class="back-btn" onclick="goto('home')"><span class="arrow">🏠</span> بازگشت به صفحه اصلی</button></div>
+      <h2 class="page-title">تعریف‌ها و آموزش تصویری</h2>
+
+      <div class="block">
+        <h3>ایدهٔ اصلی</h3>
+        <p>روی نمودار، دو نقطه انتخاب می‌کنیم و هم‌زمان بررسی می‌کنیم:</p>
+        <p>• «طول» نقطه (مقدار x) — با خط‌چین و سایهٔ رنگی روی محور x نشان داده می‌شود.<br>
+        • «عرض» نقطه (مقدار y یعنی f(x)) — با خط‌چین و سایهٔ رنگی روی محور y نشان داده می‌شود.</p>
+        <p>در هر نمودار زیر، دو نقطه (قرمز و آبی) دوتا‑دوتا جلو می‌روند تا ببینید با تغییر <b>طول</b> (x)، <b>عرض</b> (y) چه رفتاری دارد.</p>
+      </div>
+
+      <div class="block">
+        <h3>۱） تابع صعودی</h3>
+        <div class="math-line"><math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>≤</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math></div>
+        <p>یعنی با بزرگ‌تر شدن x، مقدار y هرگز کم نمی‌شود؛ <b>ممکن است در بعضی نقاط، مقدار تابع مدتی ثابت بماند</b> (نه لزوماً همیشه افزایش یابد). در نمودار زیر ابتدا دو نقطه با طول متفاوت ولی عرض مساوی می‌بینید (روی بخش تخت نمودار) و سپس دو نقطه با عرض متفاوت:</p>
+        <div class="dual-diagram" id="diag-inc"></div>
+        <div class="diagram-caption" id="diag-inc-cap"></div>
+        <div class="diagram-note" id="diag-inc-note" style="display:none"></div>
+      </div>
+
+      <div class="block">
+        <h3>۲） تابع نزولی</h3>
+        <div class="math-line"><math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>≥</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math></div>
+        <p>یعنی با بزرگ‌تر شدن x، مقدار y هرگز زیاد نمی‌شود؛ اینجا هم <b>ممکن است نقاطی وجود داشته باشند که مقدار تابع در آن‌ها ثابت بماند</b>:</p>
+        <div class="dual-diagram" id="diag-dec"></div>
+        <div class="diagram-caption" id="diag-dec-cap"></div>
+        <div class="diagram-note" id="diag-dec-note" style="display:none"></div>
+      </div>
+
+      <div class="block">
+        <h3>۳） اکیدا صعودی</h3>
+        <div class="math-line"><math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>&lt;</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math></div>
+        <p>اینجا دیگر <b>هیچ دو نقطه‌ای با عرضِ برابر وجود ندارد</b>؛ به محض بزرگ‌تر شدن طول، عرض هم قطعاً بزرگ‌تر می‌شود (بدون هیچ بخش تخت):</p>
+        <div class="dual-diagram" id="diag-sinc"></div>
+        <div class="diagram-caption" id="diag-sinc-cap"></div>
+      </div>
+
+      <div class="block">
+        <h3>۴） اکیدا نزولی</h3>
+        <div class="math-line"><math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>&gt;</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math></div>
+        <p>باز هم <b>هیچ دو نقطه‌ای با عرضِ برابر وجود ندارد</b>؛ به محض بزرگ‌تر شدن طول، عرض قطعاً کوچک‌تر می‌شود:</p>
+        <div class="dual-diagram" id="diag-sdec"></div>
+        <div class="diagram-caption" id="diag-sdec-cap"></div>
+      </div>
+
+      <div class="special-box">
+        <span class="tag">حالت خاص</span><br>
+        تابعی که در یک بازه <b>ثابت</b> باشد، طبق تعریف در آن بازه هم <b>صعودی</b> و هم <b>نزولی</b> محسوب می‌شود؛
+        اما چون در آن هیچ افزایش یا کاهشی رخ نمی‌دهد، <b>اکیدا صعودی</b> یا <b>اکیدا نزولی</b> نیست.
+        همچنین هر تابع اکیدا یکنوا، حتماً یکنواست؛ ولی عکس آن درست نیست.
+      </div>
+
+      <div class="block">
+        <h3>پرسش: آیا عکسِ «هر اکیدا یکنوا، یکنواست» درست است؟</h3>
+        <p>یعنی آیا هر تابع یکنوا، حتماً اکیدا یکنوا هم هست؟</p>
+        <button class="reveal-btn" style="--btn-color:#1e3a5f" onclick="toggleAnswer(this)">نمایش پاسخ</button>
+        <div class="answer-box">
+          <b>خیر.</b> عکس این مطلب درست نیست. برای مثال تابع:
+          <div class="math-line"><math dir="ltr"><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mo>|</mo><mi>x</mi><mo>|</mo></math></div>
+          در تمام <math dir="ltr"><mi>R</mi></math> صعودی است (هرگز کاهش نمی‌یابد) اما چون در بازهٔ <math dir="ltr"><mo>(</mo><mo>-</mo><mn>∞</mn><mo>,</mo><mn>۰</mn><mo>]</mo></math> ثابت است، اکیدا صعودی نیست.
+          پس یکنوا بودن، اکیدا یکنوا بودن را نتیجه نمی‌دهد.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== EXAMPLES ===================== -->
+    <section class="page" id="page-examples">
+      <div class="back-row"><button class="back-btn" onclick="goto('home')"><span class="arrow">🏠</span> بازگشت به صفحه اصلی</button></div>
+      <h2 class="page-title">مثال‌های حل‌شده</h2>
+
+      <div class="block">
+        <h3>مثال ۱</h3>
+        <p>دامنه، برد و نوع یکنوایی تابع زیر را بیابید:</p>
+        <div class="math-line"><math dir="ltr"><mi>y</mi><mo>=</mo><msup><mrow><mo>(</mo><mi>x</mi><mo>-</mo><mn>۱</mn><mo>)</mo></mrow><mn>۳</mn></msup><mo>-</mo><mn>۱</mn></math></div>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 280 200">
+            <line x1="10" y1="90" x2="270" y2="90" stroke="#bbb" stroke-width="1.2"/>
+            <line x1="120" y1="15" x2="120" y2="185" stroke="#bbb" stroke-width="1.2"/>
+            <polyline points="112,165 120,130 128,114 136,110 140,110 144,110 152,106 160,90 168,55" fill="none" stroke="#2563eb" stroke-width="3"/>
+            <circle cx="168" cy="55" r="4.5" fill="#16a34a"/>
+            <circle cx="140" cy="110" r="4.5" fill="#f2731e"/>
+            <text x="145" y="124" font-size="10" fill="#555">(۱,-۱)</text>
+            <circle r="5" fill="#dc2626"><animateMotion dur="4.5s" repeatCount="indefinite" path="M112,165 L120,130 L128,114 L136,110 L140,110 L144,110 L152,106 L160,90 L168,55"/></circle>
+          </svg>
+          <div class="caption">رأس نمودار دقیقاً روی نقطهٔ (۱,-۱) است، نه روی مبدأ</div>
+        </div>
+        <button class="reveal-btn" onclick="toggleAnswer(this)">نمایش جواب</button>
+        <div class="answer-box">
+          این تابع انتقال‌یافتهٔ <math dir="ltr"><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>۳</mn></msup></math> است (۱ واحد راست، ۱ واحد پایین):
+          <div class="math-line"><math dir="ltr"><msub><mi>D</mi><mi>f</mi></msub><mo>=</mo><mi>R</mi><mo>,</mo><mo>&#160;&#160;</mo><msub><mi>R</mi><mi>f</mi></msub><mo>=</mo><mi>R</mi></math></div>
+          چون <math dir="ltr"><msup><mi>x</mi><mn>۳</mn></msup></math> اکیدا صعودی است، این تابع نیز در تمام R <b>اکیدا صعودی</b> است.
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>مثال ۲</h3>
+        <p>بازه‌های صعودی/نزولی تابع پاره‌ای زیر را بیابید:</p>
+        <div class="piecewise">
+          <math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo></math>
+          <span class="brace">{</span>
+          <div class="rows">
+            <div class="row"><math dir="ltr"><mo>-</mo><mn>۲</mn><mi>x</mi><mo>-</mo><mn>۳</mn></math><span class="cond"><math dir="ltr"><mi>x</mi><mo>&lt;</mo><mo>-</mo><mn>۴</mn></math></span></div>
+            <div class="row"><math dir="ltr"><mn>۳</mn></math><span class="cond"><math dir="ltr"><mo>-</mo><mn>۴</mn><mo>≤</mo><mi>x</mi><mo>&lt;</mo><mn>۲</mn></math></span></div>
+            <div class="row"><math dir="ltr"><mn>۳</mn><mi>x</mi><mo>-</mo><mn>۲</mn></math><span class="cond"><math dir="ltr"><mi>x</mi><mo>≥</mo><mn>۲</mn></math></span></div>
+          </div>
+        </div>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 300 160">
+            <line x1="10" y1="140" x2="290" y2="140" stroke="#bbb" stroke-width="1"/>
+            <line x1="60" y1="10" x2="60" y2="150" stroke="#bbb" stroke-width="1"/>
+            <path d="M20,20 L100,70" fill="none" stroke="#dc2626" stroke-width="3"/>
+            <path d="M100,70 L190,70" fill="none" stroke="#eab308" stroke-width="3"/>
+            <path d="M190,70 L280,20" fill="none" stroke="#16a34a" stroke-width="3"/>
+            <text x="30" y="35" font-size="10" fill="#dc2626">نزولی</text>
+            <text x="120" y="63" font-size="10" fill="#8a6300">ثابت</text>
+            <text x="220" y="35" font-size="10" fill="#16a34a">صعودی</text>
+            <circle r="5" fill="#2563eb"><animateMotion dur="5s" repeatCount="indefinite" path="M20,20 L100,70 L190,70 L280,20"/></circle>
+          </svg>
+        </div>
+        <button class="reveal-btn" onclick="toggleAnswer(this)">نمایش جواب</button>
+        <div class="answer-box">
+          در <math dir="ltr"><mo>(</mo><mo>-</mo><mn>∞</mn><mo>,</mo><mo>-</mo><mn>۴</mn><mo>)</mo></math> شیب خط برابر <math dir="ltr"><mo>-</mo><mn>۲</mn></math> (منفی) است ⇐ <b>اکیدا نزولی</b>.<br>
+          در <math dir="ltr"><mo>[</mo><mo>-</mo><mn>۴</mn><mo>,</mo><mn>۲</mn><mo>)</mo></math> مقدار تابع همواره <math dir="ltr"><mn>۳</mn></math> است ⇐ <b>ثابت</b>.<br>
+          در <math dir="ltr"><mo>[</mo><mn>۲</mn><mo>,</mo><mo>+</mo><mn>∞</mn><mo>)</mo></math> شیب خط <math dir="ltr"><mn>۳</mn></math> (مثبت) است ⇐ <b>اکیدا صعودی</b>.
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>مثال ۳</h3>
+        <p>بازه‌های صعودی و نزولی تابع زیر را روی <math dir="ltr"><msub><mi>D</mi><mi>f</mi></msub><mo>=</mo><mo>[</mo><mn>۰</mn><mo>,</mo><mn>۲</mn><mi>π</mi><mo>]</mo></math> تعیین کنید:</p>
+        <div class="math-line"><math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>cos</mi><mo>(</mo><mi>x</mi><mo>-</mo><mfrac><mi>π</mi><mn>۳</mn></mfrac><mo>)</mo></math></div>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 300 175">
+            <line x1="15" y1="100" x2="285" y2="100" stroke="#bbb" stroke-width="1"/>
+            <line x1="30" y1="50" x2="30" y2="150" stroke="#bbb" stroke-width="1"/>
+            <polyline points="30,80 50,65.4 70,60" fill="none" stroke="#16a34a" stroke-width="3"/>
+            <polyline points="70,60 90,65.4 110,80 130,100 150,120 170,134.6 190,140" fill="none" stroke="#dc2626" stroke-width="3"/>
+            <polyline points="190,140 210,134.6 230,120 250,100 270,80" fill="none" stroke="#16a34a" stroke-width="3"/>
+            <text x="26" y="163" font-size="10" fill="#666">۰</text>
+            <text x="60" y="163" font-size="10" fill="#666">π/۳</text>
+            <text x="178" y="163" font-size="10" fill="#666">۴π/۳</text>
+            <text x="262" y="163" font-size="10" fill="#666">۲π</text>
+            <circle r="5" fill="#2563eb"><animateMotion dur="6s" repeatCount="indefinite" path="M30,80 L50,65.4 L70,60 L90,65.4 L110,80 L130,100 L150,120 L170,134.6 L190,140 L210,134.6 L230,120 L250,100 L270,80"/></circle>
+          </svg>
+          <div class="caption">سبز = صعودی، قرمز = نزولی</div>
+        </div>
+        <button class="reveal-btn" onclick="toggleAnswer(this)">نمایش جواب</button>
+        <div class="answer-box">
+          نمودار <math dir="ltr"><mi>cos</mi><mi>θ</mi></math> در <math dir="ltr"><mo>[</mo><mn>۰</mn><mo>,</mo><mi>π</mi><mo>]</mo></math> نزولی و در <math dir="ltr"><mo>[</mo><mi>π</mi><mo>,</mo><mn>۲</mn><mi>π</mi><mo>]</mo></math> صعودی است.
+          با انتقال بازه‌ها به اندازهٔ <math dir="ltr"><mfrac><mi>π</mi><mn>۳</mn></mfrac></math>:
+          <div class="math-line"><math dir="ltr"><mtext>&#160;اکیدا صعودی:&#160;</mtext><mo>[</mo><mn>۰</mn><mo>,</mo><mfrac><mi>π</mi><mn>۳</mn></mfrac><mo>]</mo><mo>∪</mo><mo>[</mo><mfrac><mrow><mn>۴</mn><mi>π</mi></mrow><mn>۳</mn></mfrac><mo>,</mo><mn>۲</mn><mi>π</mi><mo>]</mo></math></div>
+          <div class="math-line"><math dir="ltr"><mtext>&#160;اکیدا نزولی:&#160;</mtext><mo>[</mo><mfrac><mi>π</mi><mn>۳</mn></mfrac><mo>,</mo><mfrac><mrow><mn>۴</mn><mi>π</mi></mrow><mn>۳</mn></mfrac><mo>]</mo></math></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>مثال ۴</h3>
+        <p>یکنوایی تابع زیر را در R بررسی کنید:</p>
+        <div class="math-line"><math dir="ltr"><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mo>|</mo><mi>x</mi><mo>|</mo></math></div>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 300 160">
+            <line x1="15" y1="110" x2="285" y2="110" stroke="#bbb" stroke-width="1"/>
+            <line x1="70" y1="15" x2="70" y2="145" stroke="#bbb" stroke-width="1"/>
+            <path d="M25,110 L70,110 L115,38" fill="none" stroke="#2563eb" stroke-width="3"/>
+            <circle cx="70" cy="110" r="4" fill="#f2731e"/>
+            <text x="30" y="126" font-size="10" fill="#8a6300">ثابت (=۰)</text>
+            <text x="120" y="45" font-size="10" fill="#16a34a">اکیدا صعودی</text>
+            <circle r="5" fill="#dc2626"><animateMotion dur="4s" repeatCount="indefinite" path="M25,110 L70,110 L115,38"/></circle>
+          </svg>
+        </div>
+        <button class="reveal-btn" onclick="toggleAnswer(this)">نمایش جواب</button>
+        <div class="answer-box">
+          <div class="case-rows"><div class="rows">
+            <div class="row"><math dir="ltr"><mi>x</mi><mo>≥</mo><mn>۰</mn></math><span class="cond"><math dir="ltr"><mo>⇒</mo><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>۲</mn><mi>x</mi></math> (اکیدا صعودی)</span></div>
+            <div class="row"><math dir="ltr"><mi>x</mi><mo>&lt;</mo><mn>۰</mn></math><span class="cond"><math dir="ltr"><mo>⇒</mo><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>۰</mn></math> (ثابت)</span></div>
+          </div></div>
+          پس g در تمام R فقط <b>صعودی</b> است (نه اکیدا).
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>مثال ۵</h3>
+        <p>یکنوایی تابع زیر را در R بررسی کنید:</p>
+        <div class="math-line"><math dir="ltr"><mi>t</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo>-</mo><msup><mi>x</mi><mn>۳</mn></msup><mo>-</mo><mn>۱</mn></math></div>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 300 200">
+            <line x1="20" y1="90" x2="280" y2="90" stroke="#bbb" stroke-width="1.2"/>
+            <line x1="150" y1="15" x2="150" y2="185" stroke="#bbb" stroke-width="1.2"/>
+            <polyline points="115,46 125,90 137,112 150,115 163,118 175,140 185,184" fill="none" stroke="#2563eb" stroke-width="3"/>
+            <circle cx="150" cy="115" r="4" fill="#f2731e"/>
+            <text x="155" y="128" font-size="10" fill="#555">(۰,-۱)</text>
+            <circle r="5" fill="#dc2626"><animateMotion dur="4.5s" repeatCount="indefinite" path="M115,46 L125,90 L137,112 L150,115 L163,118 L175,140 L185,184"/></circle>
+          </svg>
+        </div>
+        <button class="reveal-btn" onclick="toggleAnswer(this)">نمایش جواب</button>
+        <div class="answer-box">
+          چون <math dir="ltr"><msup><mi>x</mi><mn>۳</mn></msup></math> اکیدا صعودی است، ضرب در <math dir="ltr"><mo>-</mo><mn>۱</mn></math> نوع یکنوایی را برعکس می‌کند و انتقال عمودی آن را تغییر نمی‌دهد. پس t در تمام R <b>اکیدا نزولی</b> است.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== QUIZ ===================== -->
+    <section class="page" id="page-quiz">
+      <div class="back-row"><button class="back-btn" onclick="goto('home')"><span class="arrow">🏠</span> بازگشت به صفحه اصلی</button></div>
+      <h2 class="page-title">آزمون (۵ سؤال)</h2>
+      <div id="quiz-questions"></div>
+      <button class="submit-btn" onclick="submitQuiz()">دیدن نتیجه</button>
+    </section>
+
+    <!-- ===================== RESULTS ===================== -->
+    <section class="page" id="page-results">
+      <div class="back-row"><button class="back-btn" onclick="goto('home')"><span class="arrow">🏠</span> بازگشت به صفحه اصلی</button></div>
+      <h2 class="page-title">نتیجهٔ آزمون</h2>
+      <div id="score-banner"></div>
+      <div id="results-list"></div>
+      <button class="retry-btn" onclick="openQuiz()">🔄 آزمون مجدد (سؤالات جدید)</button>
+    </section>
+
+    <!-- ===================== NOTES ===================== -->
+    <section class="page" id="page-notes">
+      <div class="back-row"><button class="back-btn" onclick="goto('home')"><span class="arrow">🏠</span> بازگشت به صفحه اصلی</button></div>
+      <h2 class="page-title">نکات کلیدی</h2>
+
+      <div class="special-box">
+        <span class="tag">حالت خاص — مهم</span><br>
+        تابع <b>ثابت</b> در یک بازه، طبق تعریف <b>هم صعودی و هم نزولی</b> است؛ ولی چون هیچ افزایش یا کاهشی ندارد،
+        <b>اکیدا</b> صعودی یا نزولی نیست. این نکته یکی از پرتکرارترین اشتباهات دانش‌آموزان است!
+      </div>
+
+      <div class="block">
+        <p>• هر تابع <b>اکیدا یکنوا</b>، حتماً یکنواست؛ اما عکس آن درست نیست (مثال:
+          <math dir="ltr"><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mo>|</mo><mi>x</mi><mo>|</mo></math>).</p>
+        <p>• <b>انتقال عمودی یا افقی</b> نمودار، نوع یکنوایی تابع را تغییر نمی‌دهد.</p>
+        <p>• <b>ضرب تابع در عدد منفی</b>، نوع یکنوایی را برعکس می‌کند: صعودی ↔ نزولی.</p>
+      </div>
+
+      <div class="block">
+        <h3>یافتن حداکثر a برای بازهٔ نزولی</h3>
+        <p>برای تابع زیر:</p>
+        <div class="math-line"><math dir="ltr"><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>۲</mn></msup><mo>|</mo><mi>x</mi><mo>|</mo></math></div>
+        <div class="case-rows"><div class="rows">
+          <div class="row"><math dir="ltr"><mi>x</mi><mo>≥</mo><mn>۰</mn></math><span class="cond"><math dir="ltr"><mo>⇒</mo><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>۳</mn></msup></math> (صعودی)</span></div>
+          <div class="row"><math dir="ltr"><mi>x</mi><mo>&lt;</mo><mn>۰</mn></math><span class="cond"><math dir="ltr"><mo>⇒</mo><mi>y</mi><mo>=</mo><mo>-</mo><msup><mi>x</mi><mn>۳</mn></msup></math> (نزولی)</span></div>
+        </div></div>
+        <p>پس بزرگ‌ترین بازهٔ نزولیِ <math dir="ltr"><mo>(</mo><mo>-</mo><mn>∞</mn><mo>,</mo><mi>a</mi><mo>]</mo></math> با مقدار زیر به دست می‌آید:</p>
+        <div class="math-line"><math dir="ltr"><mi>a</mi><mo>=</mo><mn>۰</mn></math></div>
+      </div>
+
+      <div class="block">
+        <h3>یکنوایی اکیدا در دامنه، ولی نه در کل R</h3>
+        <div class="svg-wrap">
+          <svg class="diagram" viewBox="0 0 300 160">
+            <line x1="10" y1="80" x2="290" y2="80" stroke="#bbb" stroke-width="1"/>
+            <line x1="150" y1="10" x2="150" y2="150" stroke="#bbb" stroke-width="1"/>
+            <path d="M155,10 C170,30 200,55 280,68" fill="none" stroke="#2563eb" stroke-width="3"/>
+            <path d="M20,92 C100,105 130,130 145,150" fill="none" stroke="#2563eb" stroke-width="3"/>
+          </svg>
+        </div>
+        <p>نمودار زیر تابع <math dir="ltr"><mi>y</mi><mo>=</mo><mfrac><mn>۱</mn><mi>x</mi></mfrac></math> است. در هر یک از دو بازهٔ زیر، این تابع اکیدا نزولی است:</p>
+        <div class="math-line"><math dir="ltr"><mo>(</mo><mo>-</mo><mn>∞</mn><mo>,</mo><mn>۰</mn><mo>)</mo><mtext>&#160;,&#160;</mtext><mo>(</mo><mn>۰</mn><mo>,</mo><mo>+</mo><mn>∞</mn><mo>)</mo></math></div>
+        <p>اما در <b>کل دامنه</b> (یعنی هر دو بازه با هم) اکیدا نزولی نیست! دلیلش این نیست که در <math dir="ltr"><mi>x</mi><mo>=</mo><mn>۰</mn></math> تعریف نشده؛ دلیل اصلی این است که <b>رفتار تابع در دو طرفِ صفر با هم فرق دارد</b>: وقتی یک نقطه از سمت چپِ صفر را با یک نقطه از سمت راستِ صفر مقایسه می‌کنیم، تابع مثل یک تابع <b>صعودی</b> رفتار می‌کند، نه نزولی! برای مثال:</p>
+        <div class="math-line"><math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>=</mo><mo>-</mo><mn>۱</mn><mo>&lt;</mo><mn>۱</mn><mo>=</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>=</mo><mo>-</mo><mn>۱</mn><mo>&lt;</mo><mn>۱</mn><mo>=</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math></div>
+        <p>یعنی با اینکه <math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub></math>، مقدار تابع هم بزرگ‌تر شده — دقیقاً برخلاف نزولی بودن. پس در هر بازه به‌تنهایی اکیدا نزولی است، ولی در کل دامنه (دو بازه با هم) نه.</p>
+      </div>
+    </section>
+
+  </div><!-- /card -->
+
+  <div class="designer">طراح : اقدامی مقدم</div>
+</div><!-- /wrap -->
+
+<audio id="bgm" src="https://mixkit.ir/wp-content/uploads/2022/03/XWorld-S11.mp3" loop preload="none"></audio>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn music" id="musicBtn" onclick="toggleMusic()"><span id="musicIcon">🎵</span> <span id="musicLabel">پخش آهنگ</span></button>
+  <button class="ctrl-btn" onclick="clearAll()">🧹 پاک کردن</button>
+</div>
+
+<script>
+/* ---------- navigation ---------- */
+function goto(id){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelectorAll('#page-'+id+' .back-btn').forEach(function(btn){
+    btn.classList.remove('enter');
+    void btn.offsetWidth;
+    btn.classList.add('enter');
+  });
+  if(id==='concepts'){ startConceptAnimations(); }
+}
+
+/* ---------- answer reveal ---------- */
+function toggleAnswer(btn){
+  const box = btn.nextElementSibling;
+  box.classList.toggle('show');
+  btn.textContent = box.classList.contains('show') ? 'پنهان کردن جواب' : 'نمایش جواب';
+}
+
+/* ---------- music ---------- */
+const bgm = document.getElementById('bgm');
+let isPlaying = false;
+function toggleMusic(){
+  const btn = document.getElementById('musicBtn');
+  const icon = document.getElementById('musicIcon');
+  const label = document.getElementById('musicLabel');
+  if(isPlaying){
+    bgm.pause();
+    icon.textContent='🎵'; label.textContent='پخش آهنگ';
+    btn.classList.remove('playing');
+  }else{
+    bgm.play().catch(function(){});
+    icon.textContent='⏸️'; label.textContent='توقف آهنگ';
+    btn.classList.add('playing');
+  }
+  isPlaying = !isPlaying;
+}
+
+/* ---------- clear ---------- */
+function clearAll(){
+  quizState.answers = quizState.questions.map(function(){return null;});
+  if(document.getElementById('page-quiz').classList.contains('active')){
+    renderQuiz();
+  }
+  goto('home');
+}
+
+/* ---------- persian digits ---------- */
+const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+function toFa(n){ return String(n).replace(/[0-9]/g, function(d){return faDigits[d];}); }
+
+/* ================= dual-point diagrams (concepts page) ================= */
+const DIAG_W=300, DIAG_H=190, AX=40, AY=160, TOPY=15, RIGHTX=285;
+
+function curveIncNonStrict(x){
+  if(x<=120){ const t=(x-AX)/(120-AX); return AY-t*70; }
+  else if(x<=200){ return 90; }
+  else { const t=(x-200)/(RIGHTX-200); return 90-t*75; }
+}
+function curveDecNonStrict(x){
+  if(x<=120){ const t=(x-AX)/(120-AX); return TOPY+t*75; }
+  else if(x<=200){ return 90; }
+  else { const t=(x-200)/(RIGHTX-200); return 90+t*70; }
+}
+function curveIncStrict(x){
+  const t = Math.max((x-AX)/(RIGHTX-AX),0);
+  return AY - Math.pow(t,1.15)*(AY-TOPY);
+}
+function curveDecStrict(x){
+  const t = Math.max((x-AX)/(RIGHTX-AX),0);
+  return TOPY + Math.pow(t,1.15)*(AY-TOPY);
+}
+
+function buildCurvePoints(fn){
+  const pts=[];
+  for(let x=AX; x<=RIGHTX; x+=6){ pts.push(x+","+fn(x).toFixed(1)); }
+  return pts.join(' ');
+}
+function pctLeft(x){ return (x/DIAG_W*100)+'%'; }
+function pctTop(y){ return (y/DIAG_H*100)+'%'; }
+
+const DIAGRAMS = {
+  'diag-inc': {fn:curveIncNonStrict, rel:'≤', strict:false, pairs:[[140,180],[60,260]]},
+  'diag-dec': {fn:curveDecNonStrict, rel:'≥', strict:false, pairs:[[140,180],[60,260]]},
+  'diag-sinc':{fn:curveIncStrict,    rel:'&lt;', strict:true,  pairs:[[70,110],[150,190],[230,270]]},
+  'diag-sdec':{fn:curveDecStrict,    rel:'&gt;', strict:true,  pairs:[[70,110],[150,190],[230,270]]}
+};
+
+function initDiagram(id){
+  const cfg = DIAGRAMS[id];
+  const box = document.getElementById(id);
+  const svgHTML =
+    '<svg viewBox="0 0 '+DIAG_W+' '+DIAG_H+'" class="diagram-bg" preserveAspectRatio="none">'
+    +'<line x1="'+AX+'" y1="'+AY+'" x2="'+RIGHTX+'" y2="'+AY+'" stroke="#aaa" stroke-width="1.5"/>'
+    +'<line x1="'+AX+'" y1="'+(TOPY-5)+'" x2="'+AX+'" y2="'+(AY+8)+'" stroke="#aaa" stroke-width="1.5"/>'
+    +'<polyline points="'+buildCurvePoints(cfg.fn)+'" fill="none" stroke="#2563eb" stroke-width="3"/>'
+    +'</svg>';
+  box.innerHTML = svgHTML
+    +'<div class="guide-v" id="'+id+'-v1"></div><div class="guide-v" id="'+id+'-v2"></div>'
+    +'<div class="guide-h" id="'+id+'-h1"></div><div class="guide-h" id="'+id+'-h2"></div>'
+    +'<div class="shadow-dot" id="'+id+'-sx1"></div><div class="shadow-dot" id="'+id+'-sx2"></div>'
+    +'<div class="shadow-dot" id="'+id+'-sy1"></div><div class="shadow-dot" id="'+id+'-sy2"></div>'
+    +'<div class="pt-dot" id="'+id+'-p1"></div><div class="pt-dot" id="'+id+'-p2"></div>'
+    +'<div class="pt-lbl pt-lbl-x" id="'+id+'-lx1">x₁</div><div class="pt-lbl pt-lbl-x" id="'+id+'-lx2">x₂</div>'
+    +'<div class="pt-lbl pt-lbl-y" id="'+id+'-ly1">y₁</div><div class="pt-lbl pt-lbl-y" id="'+id+'-ly2">y₂</div>';
+
+  const colorMap = {v1:'#dc2626',v2:'#2563eb',h1:'#dc2626',h2:'#2563eb',
+    sx1:'#dc2626',sx2:'#2563eb',sy1:'#dc2626',sy2:'#2563eb',
+    p1:'#dc2626',p2:'#2563eb',lx1:'#dc2626',lx2:'#2563eb',ly1:'#dc2626',ly2:'#2563eb'};
+  Object.keys(colorMap).forEach(function(suf){
+    const el = document.getElementById(id+'-'+suf);
+    if(el.classList.contains('guide-v') || el.classList.contains('guide-h')){ el.style.borderColor = colorMap[suf]; }
+    else if(el.classList.contains('pt-lbl')){ el.style.color = colorMap[suf]; }
+    else { el.style.background = colorMap[suf]; }
+  });
+}
+
+function updateDiagram(id, x1, x2){
+  const cfg = DIAGRAMS[id];
+  const y1=cfg.fn(x1), y2=cfg.fn(x2);
+  function set(suf, styleObj){
+    const el = document.getElementById(id+'-'+suf);
+    Object.assign(el.style, styleObj);
+  }
+  set('v1',{left:pctLeft(x1), top:pctTop(y1), height:'calc('+pctTop(AY)+' - '+pctTop(y1)+')'});
+  set('v2',{left:pctLeft(x2), top:pctTop(y2), height:'calc('+pctTop(AY)+' - '+pctTop(y2)+')'});
+  set('h1',{top:pctTop(y1), left:pctLeft(AX), width:'calc('+pctLeft(x1)+' - '+pctLeft(AX)+')'});
+  set('h2',{top:pctTop(y2), left:pctLeft(AX), width:'calc('+pctLeft(x2)+' - '+pctLeft(AX)+')'});
+  set('sx1',{left:pctLeft(x1), top:pctTop(AY)});
+  set('sx2',{left:pctLeft(x2), top:pctTop(AY)});
+  set('sy1',{left:pctLeft(AX), top:pctTop(y1)});
+  set('sy2',{left:pctLeft(AX), top:pctTop(y2)});
+  set('p1',{left:pctLeft(x1), top:pctTop(y1)});
+  set('p2',{left:pctLeft(x2), top:pctTop(y2)});
+  set('lx1',{left:pctLeft(x1), top:'calc('+pctTop(AY)+' + 6px)'});
+  set('lx2',{left:pctLeft(x2), top:'calc('+pctTop(AY)+' + 6px)'});
+  set('ly1',{left:'calc('+pctLeft(AX)+' - 6px)', top:pctTop(y1)});
+  set('ly2',{left:'calc('+pctLeft(AX)+' - 6px)', top:pctTop(y2)});
+
+  const capEl = document.getElementById(id+'-cap');
+  if(capEl){
+    capEl.innerHTML = '<math dir="ltr"><msub><mi>x</mi><mn>۱</mn></msub><mo>&lt;</mo><msub><mi>x</mi><mn>۲</mn></msub>'
+      +'<mo>⇒</mo><mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۱</mn></msub><mo>)</mo><mo>'+cfg.rel+'</mo>'
+      +'<mi>f</mi><mo>(</mo><msub><mi>x</mi><mn>۲</mn></msub><mo>)</mo></math>';
+  }
+  const noteEl = document.getElementById(id+'-note');
+  if(noteEl){
+    if(!cfg.strict && Math.abs(y1-y2)<2){
+      noteEl.style.display='block';
+      noteEl.textContent='توجه: در این نمونه f(x۱)=f(x۲) است؛ یعنی تابع در این بازه ثابت مانده است.';
+    } else {
+      noteEl.style.display='none';
+    }
+  }
+}
+
+let conceptAnimStarted=false;
+let pairIdx = {'diag-inc':0,'diag-dec':0,'diag-sinc':0,'diag-sdec':0};
+function stepDiagram(id){
+  const cfg = DIAGRAMS[id];
+  const p = cfg.pairs[pairIdx[id]%cfg.pairs.length];
+  updateDiagram(id, p[0], p[1]);
+  pairIdx[id]++;
+}
+function startConceptAnimations(){
+  if(conceptAnimStarted) return;
+  conceptAnimStarted = true;
+  Object.keys(DIAGRAMS).forEach(function(id){
+    initDiagram(id);
+    setTimeout(function(){ stepDiagram(id); }, 200);
+    setInterval(function(){ stepDiagram(id); }, 2800);
+  });
+}
+
+/* ---------- quiz question pool ---------- */
+const QUESTION_POOL = [
+  {
+    text:'تابع زیر در چه بازه‌ای اکیدا صعودی است؟',
+    formula:'<math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>۲</mn><mo>)</mo></mrow><mn>۳</mn></msup><mo>-</mo><mn>۲</mn></math>',
+    options:['<math dir="ltr"><mi>R</mi></math>&nbsp;(تمام اعداد حقیقی)','فقط در (−∞,۰)','فقط در (۰,+∞)','اکیدا صعودی نیست'],
+    correct:0,
+    solution:'تابع <math dir="ltr"><msup><mi>x</mi><mn>۳</mn></msup></math> در تمام R اکیدا صعودی است و انتقال (جمع/کم عدد ثابت) این ویژگی را تغییر نمی‌دهد؛ پس f در تمام R اکیدا صعودی است.'
+  },
+  {
+    text:'برای تابع پاره‌ای زیر، رفتار تابع در بازهٔ <math dir="ltr"><mo>[</mo><mo>-</mo><mn>۴</mn><mo>,</mo><mn>۲</mn><mo>)</mo></math> چگونه است؟',
+    formula:'<div class="piecewise"><math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo></math><span class="brace">{</span><div class="rows">'
+      +'<div class="row"><math dir="ltr"><mo>-</mo><mn>۲</mn><mi>x</mi><mo>-</mo><mn>۳</mn></math><span class="cond"><math dir="ltr"><mi>x</mi><mo>&lt;</mo><mo>-</mo><mn>۴</mn></math></span></div>'
+      +'<div class="row"><math dir="ltr"><mn>۳</mn></math><span class="cond"><math dir="ltr"><mo>-</mo><mn>۴</mn><mo>≤</mo><mi>x</mi><mo>&lt;</mo><mn>۲</mn></math></span></div>'
+      +'<div class="row"><math dir="ltr"><mn>۳</mn><mi>x</mi><mo>-</mo><mn>۲</mn></math><span class="cond"><math dir="ltr"><mi>x</mi><mo>≥</mo><mn>۲</mn></math></span></div>'
+      +'</div></div>',
+    options:['صعودی','نزولی','ثابت','اکیدا صعودی'],
+    correct:2,
+    solution:'در این بازه مقدار تابع همواره برابر ۳ است، پس تابع در این بازه ثابت است (طبق تعریف، هم صعودی و هم نزولی، ولی نه اکیدا).'
+  },
+  {
+    text:'تابع زیر در کدام بازه اکیدا نزولی است؟',
+    formula:'<math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo>|</mo><mi>x</mi><mo>|</mo></math>',
+    options:['(−∞,۰)','(۰,+∞)','R (تمام دامنه)','در هیچ بازه‌ای'],
+    correct:0,
+    solution:'برای x&lt;۰، f(x)=−x است که شیب آن −۱ (منفی) است؛ پس در بازهٔ (−∞,۰) اکیدا نزولی است. برای x&gt;۰، f(x)=x است که اکیدا صعودی است، نه نزولی.'
+  },
+  {
+    text:'تابع زیر روی <math dir="ltr"><mo>[</mo><mn>۰</mn><mo>,</mo><mn>۲</mn><mi>π</mi><mo>]</mo></math> در کدام بازه اکیدا نزولی است؟',
+    formula:'<math dir="ltr"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>cos</mi><mo>(</mo><mi>x</mi><mo>-</mo><mfrac><mi>π</mi><mn>۳</mn></mfrac><mo>)</mo></math>',
+    options:['[π/۳,۴π/۳]','[۰,π/۳]','[۴π/۳,۲π]','[۰,۲π]'],
+    correct:0,
+    solution:'با انتقال نمودار کسینوس به اندازهٔ π/۳ به راست، بازهٔ نزولیِ کسینوس یعنی [۰,π] به بازهٔ [π/۳,۴π/۳] منتقل می‌شود.'
+  },
+  {
+    text:'تابع زیر در تمام دامنهٔ R چگونه است؟',
+    formula:'<math dir="ltr"><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mo>|</mo><mi>x</mi><mo>|</mo></math>',
+    options:['صعودی (نه اکیدا)','اکیدا صعودی','نزولی','ثابت'],
+    correct:0,
+    solution:'برای x≥۰، g(x)=۲x (اکیدا صعودی) و برای x&lt;۰، g(x)=۰ (ثابت). در کل R هرگز کاهش نمی‌یابد، پس فقط صعودی است، نه اکیدا.'
+  },
+  {
+    text:'تابع زیر در تمام R چگونه است؟',
+    formula:'<math dir="ltr"><mi>t</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo>-</mo><msup><mi>x</mi><mn>۳</mn></msup><mo>-</mo><mn>۱</mn></math>',
+    options:['اکیدا نزولی','اکیدا صعودی','ثابت','نه صعودی، نه نزولی'],
+    correct:0,
+    solution:'چون x³ اکیدا صعودی است، ضرب در −۱ نوع یکنوایی را برعکس می‌کند؛ پس t اکیدا نزولی است.'
+  },
+  {
+    text:'تابع زیر در بازهٔ <math dir="ltr"><mo>(</mo><mo>-</mo><mn>∞</mn><mo>,</mo><mi>a</mi><mo>]</mo></math> نزولی است. حداکثر مقدار a چقدر است؟',
+    formula:'<math dir="ltr"><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>۲</mn></msup><mo>|</mo><mi>x</mi><mo>|</mo></math>',
+    options:['۰','۱','−۱','بی‌نهایت'],
+    correct:0,
+    solution:'برای x≥۰، y=x³ (صعودی) و برای x&lt;۰، y=−x³ (نزولی). پس بزرگ‌ترین بازهٔ نزولی تا a=۰ ادامه دارد.'
+  },
+  {
+    text:'اگر تابعی اکیدا صعودی باشد، حتماً …',
+    formula:'',
+    options:['یکنواست (صعودی هم هست)','نزولی هم است','در همه‌جا ثابت است','تعریف‌نشده است'],
+    correct:0,
+    solution:'هر تابع اکیدا صعودی، شرط تابع صعودی (≤) را نیز برآورده می‌کند؛ پس یکنواست. اما عکس این موضوع همیشه درست نیست.'
+  }
+];
+
+/* ---------- quiz state ---------- */
+let quizState = {questions:[], answers:[]};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+
+function openQuiz(){
+  const pool = shuffle(QUESTION_POOL).slice(0,5);
+  quizState.questions = pool.map(function(q){
+    const optionIdx = shuffle([0,1,2,3]);
+    const newOptions = optionIdx.map(function(i){return q.options[i];});
+    const newCorrect = optionIdx.indexOf(q.correct);
+    return {text:q.text, formula:q.formula, solution:q.solution, options:newOptions, correct:newCorrect};
+  });
+  quizState.answers = quizState.questions.map(function(){return null;});
+  renderQuiz();
+  goto('quiz');
+}
+
+function renderQuiz(){
+  const wrap = document.getElementById('quiz-questions');
+  wrap.innerHTML = quizState.questions.map(function(q,qi){
+    const opts = q.options.map(function(opt,oi){
+      const sel = quizState.answers[qi]===oi ? 'selected' : '';
+      return '<label class="opt '+sel+'" onclick="selectAnswer('+qi+','+oi+')">'
+        +'<input type="radio" name="q'+qi+'" '+(quizState.answers[qi]===oi?'checked':'')+'>'
+        +'<span class="inline-math">'+opt+'</span></label>';
+    }).join('');
+    const formulaHTML = q.formula ? ('<div class="math-line">'+q.formula+'</div>') : '';
+    return '<div class="qcard"><div class="qtitle">سؤال '+toFa(qi+1)+': '+q.text+'</div>'+formulaHTML+opts+'</div>';
+  }).join('');
+}
+
+function selectAnswer(qi,oi){
+  quizState.answers[qi]=oi;
+  renderQuiz();
+}
+
+function submitQuiz(){
+  if(quizState.answers.indexOf(null) !== -1){
+    alert('لطفاً به همهٔ سؤال‌ها پاسخ دهید.');
+    return;
+  }
+  let score = 0;
+  quizState.questions.forEach(function(q,qi){ if(quizState.answers[qi]===q.correct) score++; });
+
+  const banner = document.getElementById('score-banner');
+  banner.innerHTML = '<div class="score-banner '+(score<3?'low':'')+'">'
+      +'<div>نمرهٔ شما</div><div class="num">'+toFa(score)+' از '+toFa(5)+'</div></div>';
+
+  const list = document.getElementById('results-list');
+  list.innerHTML = quizState.questions.map(function(q,qi){
+    const ok = quizState.answers[qi]===q.correct;
+    const formulaHTML = q.formula ? ('<div class="math-line">'+q.formula+'</div>') : '';
+    return '<div class="res-item '+(ok?'correct':'wrong')+'">'
+      +'<span class="res-tag '+(ok?'ok':'bad')+'">'+(ok?'درست':'نادرست')+'</span>'
+      +'<div class="qtitle">سؤال '+toFa(qi+1)+': '+q.text+'</div>'
+      +formulaHTML
+      +'<div class="your">پاسخ شما: <span class="inline-math">'+q.options[quizState.answers[qi]]+'</span></div>'
+      +'<div class="your">پاسخ درست: <span class="inline-math">'+q.options[q.correct]+'</span></div>'
+      +'<div class="sol"><b>حل کامل:</b> '+q.solution+'</div></div>';
+  }).join('');
+
+  goto('results');
+
+  if(score>=4){
+    launchConfetti();
+    playJingle();
+  }
+}
+
+/* ---------- confetti ---------- */
+function launchConfetti(){
+  const colors=['#2563eb','#f2731e','#16a34a','#eab308','#1e3a5f','#dc2626'];
+  for(let i=0;i<70;i++){
+    const el = document.createElement('div');
+    el.className='confetti';
+    el.style.left = Math.random()*100+'vw';
+    el.style.width = (6+Math.random()*6)+'px';
+    el.style.height = (6+Math.random()*6)+'px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration = (2.2+Math.random()*1.8)+'s';
+    el.style.animationDelay = (Math.random()*0.6)+'s';
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 4500);
+  }
+}
+
+/* ---------- jingle sound (Web Audio synth) ---------- */
+function playJingle(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const notes = [523.25,659.25,784,1046.5];
+    notes.forEach(function(freq,i){
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type='sine';
+      osc.frequency.value=freq;
+      osc.connect(gain); gain.connect(ctx.destination);
+      const t = ctx.currentTime + i*0.14;
+      gain.gain.setValueAtTime(0.0001,t);
+      gain.gain.exponentialRampToValueAtTime(0.25,t+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+      osc.start(t); osc.stop(t+0.32);
+    });
+  }catch(e){}
+}
+
+/* ---------- init ---------- */
+document.querySelectorAll('#page-home .back-btn').forEach(function(btn){ btn.classList.add('enter'); });
+</script>
+</body>
+</html>
